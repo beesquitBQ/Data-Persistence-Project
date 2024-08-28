@@ -7,11 +7,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
-[DefaultExecutionOrder(-10)]
 public class MainManager : MonoBehaviour
 {
-    public static MainManager Instance { get; private set; }
-    public string playerName = "";
+    public static MainManager Instance;
+
+    public string playerName;
 
     public Brick BrickPrefab;
     public int LineCount = 6;

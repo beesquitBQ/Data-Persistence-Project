@@ -7,11 +7,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
-[DefaultExecutionOrder(-10)]
 public class MainManager : MonoBehaviour
 {
-    public static MainManager Instance { get; private set; }
-    public string playerName = "";
+    public static MainManager Instance;
+
+    public string playerName;
 
     public Brick BrickPrefab;
     public int LineCount = 6;
@@ -31,17 +31,14 @@ public class MainManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("MainManager Awake called");
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadHighscore();
-            Debug.Log("MainManager instance created and set to DontDestroyOnLoad");
         }
         else if (Instance != this)
         {
-            Debug.Log("Destroying duplicate MainManager instance");
             Destroy(gameObject);
         }
     }
@@ -57,7 +54,6 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log($"Player name in MainManager: {playerName}");
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -94,7 +90,7 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene(0/*SceneManager.GetActiveScene().buildIndex*/);
             }
         }
     }
@@ -102,7 +98,7 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {playerName} : {m_Points}";
+        ScoreText.text = $"Score : {m_Points}";
     }
 
     public void GameOver()
@@ -127,12 +123,12 @@ public class MainManager : MonoBehaviour
         data.bestScore = bestScore;
         string json = JsonUtility.ToJson(data);
 
-        File.WriteAllText(Application.persistentDataPath + "/savefile1.json", json);
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
     public void LoadHighscore()
     {
-        string path = Application.persistentDataPath + "/savefile1.json";
+        string path = Application.persistentDataPath + "/savefile.json";
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);

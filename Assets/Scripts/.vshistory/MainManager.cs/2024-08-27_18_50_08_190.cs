@@ -7,18 +7,17 @@ using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
-[DefaultExecutionOrder(-10)]
 public class MainManager : MonoBehaviour
 {
-    public static MainManager Instance { get; private set; }
-    public string playerName = "";
+    public static MainManager Instance;
+
+    public string playerName;
 
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
-    public Text BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -26,38 +25,27 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    public int bestScore;
-    public string bestPlayerName;
-
     private void Awake()
     {
-        Debug.Log("MainManager Awake called");
-        if (Instance == null)
+        if (Instance != null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            LoadHighscore();
-            Debug.Log("MainManager instance created and set to DontDestroyOnLoad");
-        }
-        else if (Instance != this)
-        {
-            Debug.Log("Destroying duplicate MainManager instance");
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        LoadHighscore();
     }
 
     [System.Serializable]
     class SaveData
     {
         public string playerName;
-        public int bestScore;
-        public string bestPlayerName;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log($"Player name in MainManager: {playerName}");
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -72,7 +60,6 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
-        UpdateBestScoreText();
     }
 
     private void Update()
@@ -102,55 +89,33 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {playerName} : {m_Points}";
+        ScoreText.text = $"Score : {m_Points}";
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
-
-        if (m_Points > bestScore)
-        {
-            bestScore = m_Points;
-            bestPlayerName = playerName;
-            SaveHighscore();
-            UpdateBestScoreText();
-        }
     }
 
     public void SaveHighscore()
     {
         SaveData data = new SaveData();
-        data.playerName = playerName;
-        data.bestPlayerName = bestPlayerName;
-        data.bestScore = bestScore;
+        data.playerName = name;
         string json = JsonUtility.ToJson(data);
 
-        File.WriteAllText(Application.persistentDataPath + "/savefile1.json", json);
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
     public void LoadHighscore()
     {
-        string path = Application.persistentDataPath + "/savefile1.json";
+        string path = Application.persistentDataPath + "/savefile.json";
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
-            bestPlayerName = data.bestPlayerName;
-            bestScore = data.bestScore;
-            playerName = data.playerName;
+
+            name = data.playerName;
         }
-    }
-    void UpdateBestScoreText()
-    {
-        if (BestScoreText != null)
-        {
-            BestScoreText.text =  $"Best Score : {bestPlayerName} : {bestScore}";
-        }
-    }
-    public static bool IsInitialized()
-    {
-        return Instance != null;
     }
 }
