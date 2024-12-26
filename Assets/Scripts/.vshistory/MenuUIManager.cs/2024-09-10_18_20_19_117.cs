@@ -73,8 +73,8 @@ public class MenuUIManager : MonoBehaviour
             string leaderboardString = "Leaderboard:\n";
             for (int i = 0; i < MainManager.Instance.leaderList.Count; i++)
             {
-                var playerScore = MainManager.Instance.leaderList[i];
-                leaderboardString += $"{i + 1}. {playerScore.playerName}: {playerScore.score}\n";
+                var palyerScore = MainManager.Instance.leaderList[i];
+                leaderboardString += $"{i + 1}. {playerScore.palyerName}: {playerScore.score}\n";
             }
             leaderboardText.text = leaderboardString;
         }
@@ -84,7 +84,7 @@ public class MenuUIManager : MonoBehaviour
     {
         if (MainManager.Instance != null)
         {
-            MainManager.Instance.SaveLeaderList();
+            MainManager.Instance.SaveHighscore();
         }
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

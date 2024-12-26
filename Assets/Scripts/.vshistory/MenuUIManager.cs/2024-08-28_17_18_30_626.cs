@@ -10,8 +10,6 @@ using TMPro;
 public class MenuUIManager : MonoBehaviour
 {
     public InputField playerNameInput;
-    public GameObject scoresPanel;
-    public TMP_Text leaderboardText;
 
     private void Start()
     {
@@ -40,8 +38,7 @@ public class MenuUIManager : MonoBehaviour
         if (MainManager.Instance != null && playerNameInput != null)
         {
             MainManager.Instance.playerName = playerNameInput.text;
-            MainManager.Instance.SaveLeaderList();
-            Debug.Log($"Player name set and saved: {MainManager.Instance.playerName}");
+            Debug.Log($"Player name set to: {MainManager.Instance.playerName}");
         }
         else
         {
@@ -52,39 +49,14 @@ public class MenuUIManager : MonoBehaviour
     public void StartNew()
     {
         SetPlayerName();
-        SceneManager.LoadScene(1);
-    }
-
-    public void OpenScoresPanel()
-    {
-        scoresPanel.SetActive(true);
-        UpdateLeaderboardDisplay();
-    }
-
-    public void CloseScoresPanel()
-    {
-        scoresPanel.SetActive(false);
-    }
-
-    public void UpdateLeaderboardDisplay()
-    {
-        if (leaderboardText != null)
-        {
-            string leaderboardString = "Leaderboard:\n";
-            for (int i = 0; i < MainManager.Instance.leaderList.Count; i++)
-            {
-                var playerScore = MainManager.Instance.leaderList[i];
-                leaderboardString += $"{i + 1}. {playerScore.playerName}: {playerScore.score}\n";
-            }
-            leaderboardText.text = leaderboardString;
-        }
+        SceneManager.LoadScene(1); // Загрузка сцены игры
     }
 
     public void Exit()
     {
         if (MainManager.Instance != null)
         {
-            MainManager.Instance.SaveLeaderList();
+            MainManager.Instance.SaveHighscore();
         }
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

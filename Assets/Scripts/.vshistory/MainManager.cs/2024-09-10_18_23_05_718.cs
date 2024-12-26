@@ -21,66 +21,52 @@ public class MainManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadLeaderList();
+            LoadHighscore();
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
     }
 
     [System.Serializable]
-    public class PlayerScore
+    class SaveData
     {
         public string playerName;
-        public int score;
-
-        public PlayerScore(string name, int score)
-        {
-            this.playerName = name;
-            this.score = score;
-        }
+        public int bestScore;
+        public string bestPlayerName;
     }
 
-    [System.Serializable]
-    private class SaveData
-    {
-        public List<PlayerScore> leaderList;
-    }
-
-    public void AddScore(string playername, int score)
-    {
-        leaderList.Add(new PlayerScore(playername, score));
-        leaderList = leaderList.OrderByDescending(p => p.score).Take(MaxLeaderListSize).ToList();
-        SaveLeaderList();
-    }
-
-    public void SaveLeaderList()
+    public void SaveHighscore()
     {
         SaveData data = new SaveData
         {
-            leaderList = leaderList
+            playerName = playerName,
+            bestPlayerName = bestPlayerName,
+            bestScore = bestScore
         };
         string json = JsonUtility.ToJson(data);
 
         File.WriteAllText(GetSaveFilePath(), json);
-        Debug.Log("LeaderList saved");
+        Debug.Log($"Highscore saved: {bestPlayerName} - {bestScore}");
     }
 
-    public void LoadLeaderList()
+    public void LoadHighscore()
     {
         string path = GetSaveFilePath();
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
-            leaderList = data.leaderList;
-            Debug.Log("LeaderList loaded");
+            bestPlayerName = data.bestPlayerName;
+            bestScore = data.bestScore;
+            playerName = data.playerName;
+            Debug.Log($"Highscore loaded: {bestPlayerName} - {bestScore}");
         }
         else
         {
             Debug.Log("No save file found. Starting with default values.");
-            leaderList = new List<PlayerScore>();
         }
     }
 
@@ -89,9 +75,10 @@ public class MainManager : MonoBehaviour
         return Path.Combine(Application.persistentDataPath, "savefile.json");
     }
 
+    // Вызывайте этот метод перед выходом из игры
     private void OnApplicationQuit()
     {
-        SaveLeaderList();
+        SaveHighscore();
     }
 }
 
